@@ -1,0 +1,79 @@
+############################
+# Build directories
+############################
+build/
+build-*/
+out/
+out/build/
+out/install/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+CTestTestfile.cmake
+cmake_install.cmake
+install_manifest.txt
+
+############################
+# CMake user presets (local machine)
+############################
+CMakeUserPresets.json
+
+############################
+# Ninja / Make
+############################
+.ninja_deps
+.ninja_log
+*.ninja
+Makefile
+
+############################
+# Visual Studio (Windows)
+############################
+.vs/
+*.vcxproj*
+*.sln
+*.filters
+*.user
+
+############################
+# VSCode
+############################
+.vscode/
+
+############################
+# WSL / Visual Studio remote sync
+############################
+.vs/*
+!.vs/ProjectSettings.json
+
+############################
+# Compiled binaries
+############################
+*.exe
+*.out
+*.app
+*.elf
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+*.pdb
+
+############################
+# Debugging / profiling
+############################
+*.log
+*.tlog
+*.cache
+*.pid
+*.stackdump
+
+############################
+# OS junk
+############################
+.DS_Store
+Thumbs.db
