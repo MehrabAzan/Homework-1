@@ -62,18 +62,27 @@ int main() {
     // Reads user input
     cin >> m;
 
+	// Ignore the newline character after reading m to ensure that getline reads the correct lines for symbols and frequencies
+	cin.ignore();
+
     for (int i = 0; i < m; i++) {
-        char symbol = ' ';
-        int frequency = 0;
-        cin >> symbol >> frequency;
-        symbols.push_back({ symbol, frequency });
-    }
+		// Reads a line of input and extracts the symbol and its frequency
+		string line;
+		getline(cin,line);
+
+		// The first character of the line is the symbol, and the rest of the line is the frequency
+		char symbol = line.at(0);
+		int frequency = stoi(line.substr(1));
+
+		// Adds the symbol and its frequency to the symbols vector
+        symbols.push_back({ symbol,frequency });
+	}
 
     cin >> binary;
 
 	// sorts the message according to lexicographical order (ascending based on ASCII value)
-    sort(symbols.begin(), symbols.end(),
-        [](const pair<char, int>& a, const pair<char, int>& b) {
+    sort(symbols.begin(),symbols.end(),
+        [](const pair<char, int>& a,const pair<char, int>& b) {
             if (a.second != b.second)
                 return a.second > b.second;
             return a.first < b.first;
@@ -94,13 +103,13 @@ int main() {
         }
 
 		// gets a substring of the string which length is equal to the number of leading zeros
-        string temp = binary.substr(i + 1, n);
+        string temp = binary.substr(i + 1,n);
 		// Converts the binary string to an integer value
         int value = 0;
         for (char c : temp)
             value = value * 2 + (c - '0');
 		// Calculates the position and adds it to the positions vector
-        positions.push_back((int)pow(2, n) + value);
+        positions.push_back((int)pow(2,n) + value);
 
         // Move the index to the next Elias-Gamma code
         i += 1 + n;
