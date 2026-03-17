@@ -5,6 +5,12 @@
 #include <utility>
 #include <cmath>
 #include <pthread.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <cstring>
 
 using namespace std;
 
@@ -29,7 +35,7 @@ struct Args {
 // The thread function
 void* Thread(void* voidPtr) {
     // Cast the void pointer to the structure pointer
-    Args* ptr = (Args*)voidPtr;
+    Args* ptr = (Args*) voidPtr;
 
     // Initialize bits and clear positions vector
     ptr->bits = 0;
@@ -41,7 +47,7 @@ void* Thread(void* voidPtr) {
         int pos = ptr->allPositions->at(i);
         ptr->positions.push_back(pos - 1);
         // Calculate the number of bits required to represent the position and add it to the bits variable
-        ptr->bits += 2 * (int)log2(pos) + 1;
+        ptr->bits += 2 * (int) log2(pos) + 1;
         // Assign the character to the correct position in the decoded message vector
         ptr->decodedMsg->at(pos - 1) = ptr->ch;
     }
@@ -49,7 +55,34 @@ void* Thread(void* voidPtr) {
     return nullptr;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    int sockfd, portno, n;
+    struct sockaddr_in servAddr;
+    struct hostent* server;
+
+    if (argc < 3) {
+		cerr << "usage: " << argv[0] << " hostname port" << endl;
+		exit(0);
+	}
+    portno = atoi(argv[2]);
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+		cerr << "ERROR opening socket" << endl;
+		exit(0);
+	}
+    server = gethostbyname(argv[1]);
+	if (server == NULL) {
+		cerr << "ERROR, no such host" << endl;
+		exit(0);
+	}
+    memset(&servAddr, 0, sizeof(servAddr));
+    servAddr.sin_family = AF_INET;
+    bcopy((char*)server->h_addr, (char*)&servAddr.sin_addr.s_addr, server->h_length);
+	servAddr.sin_port = htons(portno);
+    if (connect(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) < 0) {
+		cerr << "ERROR connecting" << endl;
+		exit(0);
+	}
     // m is the number of threads to be created
     int m = 0;
     // binary is the encoded message
