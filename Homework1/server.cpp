@@ -11,6 +11,8 @@
 #include <cmath>
 #include <signal.h>
 
+using namespace std;
+
 struct CharacterInfo {
 	// The character to be decoded
 	char ch;
@@ -46,14 +48,14 @@ int main(int argc, char* argv[]) {
 
 	// Check for the port number from the command line
 	if (argc < 2) {
-		std::cerr << "Port not provided" << std::endl;
+		cerr << "Port not provided" << endl;
 		exit(0);
 	}
 
 	// Create a socket descriptor
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
-		std::cerr << "Error opening socket" << std::endl;
+		cerr << "Error opening socket" << endl;
 		exit(0);
 	}
 
@@ -66,7 +68,7 @@ int main(int argc, char* argv[]) {
 
 	// Bind the socket descriptor with the sockaddr_in structure
 	if (bind(sockfd, (struct sockaddr*)&servAddr, sizeof(servAddr)) < 0) {
-		std::cerr << "Error binding" << std::endl;
+		cerr << "Error binding" << endl;
 		exit(0);
 	}
 
@@ -81,7 +83,7 @@ int main(int argc, char* argv[]) {
 		// Create a child process to answer the request.
 		if (fork() == 0) {
 			if (newsockfd < 0) {
-				std::cerr << "Error on accept" << std::endl;
+				cerr << "Error on accept" << endl;
 				exit(0);
 			}
 
@@ -91,7 +93,7 @@ int main(int argc, char* argv[]) {
 			// Read the data sent by the client and store it in the Args structure
 			n = read(newsockfd, &characterInfo, sizeof(characterInfo));
 			if (n < 0) {
-				std::cerr << "Error reading from socket" << std::endl;
+				cerr << "Error reading from socket" << endl;
 				exit(0);
 			}
 
@@ -100,16 +102,16 @@ int main(int argc, char* argv[]) {
 			bzero(tempBuffer, characterInfo.binaryLength + 1);
 			n = read(newsockfd, tempBuffer, characterInfo.binaryLength + 1);
 			if (n < 0) {
-				std::cerr << "Error reading from socket" << std::endl;
+				cerr << "Error reading from socket" << endl;
 				exit(0);
 			}
 
 			// Convert the temporary buffer to a string and delete the temporary buffer
-			std::string binary = tempBuffer;
+			string binary = tempBuffer;
 			delete[] tempBuffer;
 
 			// A vector containing all positions that is obtained from the binary string
-			std::vector<int> allPositions;
+			vector<int> allPositions;
 
 			// Iterates through the binary string and extracts the positions in the decoded message
 			int i = 0;
@@ -123,7 +125,7 @@ int main(int argc, char* argv[]) {
 				}
 
 				// Gets a substring of the string which length is equal to the number of leading zeros
-				std::string temp = binary.substr(i + 1, n);
+				string temp = binary.substr(i + 1, n);
 				// Converts the binary string to an integer value
 				int value = 0;
 				for (char c : temp)
@@ -136,7 +138,7 @@ int main(int argc, char* argv[]) {
 			}
 
 			// A vector containing all positions that is obtained from the binary string
-			std::vector<int> positions;
+			vector<int> positions;
 			// The number of bits required to represent the position(s) of the character
 			int bits = 0;
 
@@ -152,7 +154,7 @@ int main(int argc, char* argv[]) {
 			// Write the number of bits required to represent the position(s) of the character to the client
 			n = write(newsockfd, &bits, sizeof(int));
 			if (n < 0) {
-				std::cerr << "Error writing to socket" << std::endl;
+				cerr << "Error writing to socket" << endl;
 				exit(0);
 			}
 
@@ -161,14 +163,14 @@ int main(int argc, char* argv[]) {
 
 			n = write(newsockfd, &nOfPositions, sizeof(int));
 			if (n < 0) {
-				std::cerr << "Error writing to socket" << std::endl;
+				cerr << "Error writing to socket" << endl;
 				exit(0);
 			}
 
 			// Write the positions to the client
 			n = write(newsockfd, positions.data(), nOfPositions * sizeof(int));
 			if (n < 0) {
-				std::cerr << "Error writing to socket" << std::endl;
+				cerr << "Error writing to socket" << endl;
 				exit(0);
 			}
 

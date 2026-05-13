@@ -6,6 +6,8 @@
 #include <cmath>
 #include <pthread.h>
 
+using namespace std;
+
 // Arguments to be passed to the thread function
 struct Args {
 	// The character to be decoded
@@ -13,13 +15,13 @@ struct Args {
 	// The number of bits required to represent the position(s) of the character
     int bits;
     // The encoded message
-    std::string binary;
+    string binary;
 	// The frequency of the character in the message
     int frequency;
 	// A pointer to the decoded message vector
-    std::vector<char>* decodedMsg;
+    vector<char>* decodedMsg;
 	// A pointer to the vector containing all positions that is obtained from the binary string
-    std::vector<int>* allPositions;
+    vector<int>* allPositions;
 	// Used to determine the starting index in the allPositions vector and assign the correct positions to the character
     int start;
     // The mutex to protect the shared resources
@@ -47,8 +49,8 @@ void* Thread(void* voidPtr) {
     int frequency = ptr->frequency;
     int start = ptr->start;
     int index = ptr->index;
-    std::string binary = ptr->binary;
-    std::vector<char>* decodedMsg = ptr->decodedMsg;
+    string binary = ptr->binary;
+    vector<char>* decodedMsg = ptr->decodedMsg;
 
     // Set copied to true to indicate that the thread has copied the arguments from the main thread
     ptr->copied = true;
@@ -60,7 +62,7 @@ void* Thread(void* voidPtr) {
     pthread_mutex_unlock(&ptr->mutex);
 
     // A vector containing all positions that is obtained from the binary string
-    std::vector<int> allPositions;
+    vector<int> allPositions;
 
     // Iterates through the binary string and extracts the positions in the decoded message
     int i = 0;
@@ -74,13 +76,13 @@ void* Thread(void* voidPtr) {
         }
 
 		// gets a substring of the string which length is equal to the number of leading zeros
-        std::string temp = binary.substr(i + 1, n);
+        string temp = binary.substr(i + 1, n);
 		// Converts the binary string to an integer value
         int value = 0;
         for (char c : temp)
             value = value * 2 + (c - '0');
 		// Calculates the position and adds it to the positions vector
-        allPositions.push_back((int)std::pow(2,n) + value);
+        allPositions.push_back((int)pow(2,n) + value);
 
         // Move the index to the next Elias-Gamma code
         i += 1 + n;
@@ -88,7 +90,7 @@ void* Thread(void* voidPtr) {
 
 	// Initialize bits and positions vector
     int bits = 0;
-    std::vector<int> positions;
+    vector<int> positions;
 
 	// Starts loop at the start variable and iterates until the end of the positions for the character
     for (int i = start; i < start + frequency; i++) {
@@ -117,13 +119,13 @@ void* Thread(void* voidPtr) {
         pthread_cond_wait(&ptr->condition, &ptr->mutex);
     
     // Print the symbol, frequency, positions, and bits required to represent the positions for each character
-    std::cout << "Symbol: " << ch << ", Frequency: " << frequency << std::endl;
-    std::cout << "Positions: ";
+    cout << "Symbol: " << ch << ", Frequency: " << frequency << endl;
+    cout << "Positions: ";
     for (int pos : positions)
-        std::cout << pos << " ";
-    std::cout << std::endl;
-    std::cout << "Bits to represent the position(s): " << bits << std::endl;
-    std::cout << std::endl;
+        cout << pos << " ";
+    cout << endl;
+    cout << "Bits to represent the position(s): " << bits << endl;
+    cout << endl;
 
     // Allow the next thread to print its results by incrementing nextToPrint
     ptr->nextToPrint++;
@@ -141,36 +143,36 @@ int main() {
     // m is the number of threads to be created
     int m = 0;
     // binary is the encoded message
-    std::string binary = "";
+    string binary = "";
 	// vector of pairs to store the symbol and its frequency
-    std::vector<std::pair<char, int>> symbols;
+    vector<pair<char, int>> symbols;
 	// vector to store the decoded message
-    std::vector<char> decodedMsg;
+    vector<char> decodedMsg;
 
     // Reads user input
-    std::cin >> m;
+    cin >> m;
 
 	// Ignore the newline character after reading m to ensure that getline reads the correct lines for symbols and frequencies
-	std::cin.ignore();
+	cin.ignore();
 
     for (int i = 0; i < m; i++) {
 		// Reads a line of input and extracts the symbol and its frequency
-		std::string line;
-		std::getline(std::cin, line);
+		string line;
+		getline(cin, line);
 
 		// The first character of the line is the symbol, and the rest of the line is the frequency
 		char symbol = line.at(0);
-		int frequency = std::stoi(line.substr(1));
+		int frequency = stoi(line.substr(1));
 
 		// Adds the symbol and its frequency to the symbols vector
         symbols.push_back({symbol, frequency});
 	}
 
-    std::cin >> binary;
+    cin >> binary;
 
 	// Sorts the message according to lexicographical order (ascending based on ASCII value)
-    std::sort(symbols.begin(), symbols.end(),
-        [](const std::pair<char, int>& a,const std::pair<char, int>& b) {
+    sort(symbols.begin(), symbols.end(),
+        [](const pair<char, int>& a,const pair<char, int>& b) {
             if (a.second != b.second)
                 return a.second > b.second;
             return a.first < b.first;
@@ -184,7 +186,7 @@ int main() {
     decodedMsg.resize(totalPositions);
 
     // Create m threads
-    std::vector<pthread_t> tid(m);
+    vector<pthread_t> tid(m);
 	// Args structures to store the arguments for each thread
     Args result;
     // Store values that can be used by all threads
@@ -215,7 +217,7 @@ int main() {
 		// Create the thread and pass the arguments to the thread function
         if (pthread_create(&tid.at(i), nullptr, Thread, (void*)&result) != 0) {
 			// If thread creation fails, print an error message and exit the program
-            std::cerr << "Error creating the thread" << std::endl;
+            cerr << "Error creating the thread" << endl;
             exit(0);
         }
 
@@ -235,10 +237,10 @@ int main() {
         pthread_join(tid.at(i), nullptr);
 
 	// Print the decoded message
-    std::cout << "Decoded message: ";
+    cout << "Decoded message: ";
     for (char c : decodedMsg)
-        std::cout << c;
-    std::cout << std::endl;
+        cout << c;
+    cout << endl;
 
     return 0;
 }
