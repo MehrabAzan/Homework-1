@@ -183,6 +183,4 @@ int main(int argc, char* argv[]) {
 	}
 	// close the socket descriptor
 	close(sockfd);
-
-	return 0;
 }

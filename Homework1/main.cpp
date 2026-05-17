@@ -241,6 +241,4 @@ int main() {
     for (char c : decodedMsg)
         cout << c;
     cout << endl;
-
-    return 0;
 }

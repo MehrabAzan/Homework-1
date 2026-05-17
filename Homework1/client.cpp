@@ -1,4 +1,4 @@
-#include <unistd.h>
+﻿#include <unistd.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -239,6 +239,4 @@ int main(int argc, char* argv[]) {
     for (char c : decodedMsg)
         cout << c;
     cout << endl;
-
-	return 0;
 }
