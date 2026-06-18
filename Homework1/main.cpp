@@ -117,7 +117,9 @@ void* Thread(void* voidPtr) {
     // Wait until it is the thread's turn to print its results
     while (ptr->nextToPrint != index)
         pthread_cond_wait(&ptr->condition, &ptr->mutex);
-    
+
+    pthread_mutex_unlock(&ptr->mutex);
+
     // Print the symbol, frequency, positions, and bits required to represent the positions for each character
     cout << "Symbol: " << ch << ", Frequency: " << frequency << endl;
     cout << "Positions: ";
@@ -127,13 +129,14 @@ void* Thread(void* voidPtr) {
     cout << "Bits to represent the position(s): " << bits << endl;
     cout << endl;
 
+    pthread_mutex_lock(&ptr->mutex);
+
     // Allow the next thread to print its results by incrementing nextToPrint
     ptr->nextToPrint++;
 
     // Broadcast to the waiting threads so that the next thread can print its results
     pthread_cond_broadcast(&ptr->condition);
 
-    // Unlock the mutex
     pthread_mutex_unlock(&ptr->mutex);
 
     return nullptr;
